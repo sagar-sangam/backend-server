@@ -156,7 +156,7 @@ exports.signin = (req, res) => {
       // Optional: Keep session if needed
       req.session.token = token;
 
-      // ✅ Return the access token to the client
+      
       res.status(200).send({
         id: user._id,
         username: user.username,
@@ -165,7 +165,7 @@ exports.signin = (req, res) => {
         status: user.status,
         email: user.email,
         roles: authorities,
-        accessToken: token, // ← this fixes your frontend issue
+        accessToken: token, 
       });
     });
 };
