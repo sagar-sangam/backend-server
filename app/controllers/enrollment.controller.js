@@ -17,25 +17,33 @@ exports.create = async (req, res) => {
       });
     }
 
-    const exists = await Enrollment.findOne({
+    // ✅ NAYA LOGIC: Check karo ki koi bhi enrollment exist karta hai kya (paid ho ya pending)
+    let enrollment = await Enrollment.findOne({
       user: userId,
       course: courseId,
-      paymentStatus: "paid",
     });
 
-    if (exists) {
-      return res.status(400).send({
-        message: "Already enrolled",
-      });
+    if (enrollment) {
+      // Agar already paid hai, toh mana kar do
+      if (enrollment.paymentStatus === "paid") {
+        return res.status(400).send({
+          message: "Already enrolled",
+        });
+      }
+      
+      // Agar 'pending' ya 'failed' hai, toh wahi purana order aage bhej do retry ke liye!
+      return res.status(200).send(enrollment);
     }
 
-    const enrollment = await Enrollment.create({
+    // Agar pehli baar Buy Now daba raha hai, toh NAYA record banao
+    enrollment = await Enrollment.create({
       user: userId,
       course: courseId,
     });
 
     res.status(201).send(enrollment);
   } catch (err) {
+    console.error("Enrollment Create Error: ", err); // Vercel logs ke liye
     res.status(500).send({
       message: err.message,
     });
