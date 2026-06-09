@@ -34,5 +34,6 @@ db.follows = require("./follow.model.js")(mongoose);
 db.addresses = require("./address.model.js")(mongoose);
 db.wishlists = require("./wishlist.model.js")(mongoose);
 db.lectures = require("./lecture.model.js")(mongoose);
+db.enrollments = require("./enrollment.model.js")(mongoose);
 
 module.exports = db;

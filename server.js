@@ -188,6 +188,7 @@ require("./app/routes/branch.routes")(app);
 require("./app/routes/profile.routes")(app);
 require("./app/routes/courseSyllabus.routes")(app);
 require("./app/routes/lecture.routes")(app);
+require("./app/routes/enrollment.routes")(app);
 
 /* ===================================
    GLOBAL ERROR HANDLER
