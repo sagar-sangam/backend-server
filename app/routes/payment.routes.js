@@ -6,6 +6,7 @@ module.exports = function(app) {
   // Create order wali API
   router.post("/create-order", payment.createOrder);
 
+  router.post("/verify", payment.verifyPayment);
   // Is route ka base URL /api/payment hoga
   app.use('/api/payment', router);
 };

@@ -8,8 +8,8 @@ exports.createOrder = async (req, res) => {
     const url = "https://sandbox.cashfree.com/pg/orders";
 
     // 👇 APNI CASHFREE SANDBOX KEYS YAHAN DAALO 👇
-    const clientId = "TEST1056301882f9cbeea57681cea2f681036501"; 
-    const clientSecret = "cfsk_ma_test_7619f22e5a8cac9ab7ac496cd65e15cb_e739ac03";
+    const clientId = process.env.CASHFREE_APP_ID;
+    const clientSecret = process.env.CASHFREE_SECRET_KEY;
 
     // Cashfree ko jo data chahiye wo prepare kar rahe hain
     const payload = {
@@ -40,11 +40,10 @@ exports.createOrder = async (req, res) => {
     res.status(200).send(response.data);
 
   } catch (error) {
-    console.error("Cashfree Create Order Error:", error.response ? error.response.data : error.message);
+    console.error("Cashfree Verify Error:", error.response ? error.response.data : error.message);
     res.status(500).send({
       success: false,
-      message: "Failed to create Cashfree order",
-      error: error.response ? error.response.data : error.message
+      message: "Failed to verify payment with Cashfree"
     });
   }
 };
