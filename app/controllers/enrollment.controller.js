@@ -198,7 +198,7 @@ exports.popularGraph = async (req, res) => {
         $project: {
           _id: 0,
           title: "$course.title",
-          enrollments: 1
+          totalEnrollments: 1
         }
       }
     ]);
