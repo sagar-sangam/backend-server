@@ -30,6 +30,7 @@ module.exports = (app) => {
   router.put("/:id/failed", enrollment.paymentFailed);
 
   router.get("/popular", enrollment.popular);
+  router.get("/popularGraph", enrollment.popularGraph);
   router.get("/user/:userId", enrollment.findByUser);
 
   router.get("/", enrollment.findAll);
