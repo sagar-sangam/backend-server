@@ -17,33 +17,25 @@ exports.create = async (req, res) => {
       });
     }
 
-    // ✅ NAYA LOGIC: Check karo ki koi bhi enrollment exist karta hai kya (paid ho ya pending)
-    let enrollment = await Enrollment.findOne({
+    const exists = await Enrollment.findOne({
       user: userId,
       course: courseId,
+      paymentStatus: "paid",
     });
 
-    if (enrollment) {
-      // Agar already paid hai, toh mana kar do
-      if (enrollment.paymentStatus === "paid") {
-        return res.status(400).send({
-          message: "Already enrolled",
-        });
-      }
-      
-      // Agar 'pending' ya 'failed' hai, toh wahi purana order aage bhej do retry ke liye!
-      return res.status(200).send(enrollment);
+    if (exists) {
+      return res.status(400).send({
+        message: "Already enrolled",
+      });
     }
 
-    // Agar pehli baar Buy Now daba raha hai, toh NAYA record banao
-    enrollment = await Enrollment.create({
+    const enrollment = await Enrollment.create({
       user: userId,
       course: courseId,
     });
 
     res.status(201).send(enrollment);
   } catch (err) {
-    console.error("Enrollment Create Error: ", err); // Vercel logs ke liye
     res.status(500).send({
       message: err.message,
     });
@@ -55,7 +47,7 @@ exports.paymentSuccess = async (req, res) => {
     const { id } = req.params;
     const { transactionId, amountPaid, expiryDate } = req.body;
 
-    const enrollment = await Enrollment.findByIdAndUpdate(
+    const enrollment = await Enrollment.findByIdAndUpdate(+
       id,
       {
         paymentStatus: "paid",
@@ -117,6 +109,51 @@ exports.findAll = async (req, res) => {
   } catch (err) {
     res.status(500).send({
       message: err.message,
+    });
+  }
+};
+
+exports.popular = async (req, res) => {
+  try {
+    const data = await Enrollment.aggregate([
+      {
+        $group: {
+          _id: "$course",
+          totalEnrollments: { $sum: 1 }
+        }
+      },
+      {
+        $sort: {
+          totalEnrollments: -1
+        }
+      },
+      {
+        $lookup: {
+          from: "courses", 
+          localField: "_id",
+          foreignField: "_id",
+          as: "course"
+        }
+      },
+      {
+        $unwind: "$course"
+      },
+      {
+        $project: {
+          _id: 0,
+          courseId: "$course._id",
+          title: "$course.title",
+          category: "$course.category",
+          price: "$course.price",
+          totalEnrollments: 1
+        }
+      }
+    ]);
+
+    res.status(200).json(data);
+  } catch (err) {
+    res.status(500).json({
+      message: err.message
     });
   }
 };
