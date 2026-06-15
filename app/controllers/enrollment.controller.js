@@ -184,20 +184,12 @@ exports.popularGraph = async (req, res) => {
         $unwind: "$course"
       },
       {
-        $lookup: {
-          from: "courses",
-          localField: "_id",
-          foreignField: "_id",
-          as: "course"
-        }
-      },
-      {
-        $unwind: "$course"
-      },
-      {
         $project: {
           _id: 0,
+          courseId: "$course._id",
           title: "$course.title",
+          category: "$course.category",
+          price: "$course.price",
           totalEnrollments: 1
         }
       }
