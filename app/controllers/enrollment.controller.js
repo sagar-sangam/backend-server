@@ -162,20 +162,26 @@ exports.popularGraph = async (req, res) => {
   try {
     const data = await Enrollment.aggregate([
       {
-        $match: {
-          paymentStatus: "paid"
-        }
-      },
-      {
         $group: {
           _id: "$course",
-          enrollments: { $sum: 1 }
+          totalEnrollments: { $sum: 1 }
         }
       },
       {
         $sort: {
-          enrollments: -1
+          totalEnrollments: -1
         }
+      },
+      {
+        $lookup: {
+          from: "courses", 
+          localField: "_id",
+          foreignField: "_id",
+          as: "course"
+        }
+      },
+      {
+        $unwind: "$course"
       },
       {
         $lookup: {
