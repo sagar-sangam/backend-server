@@ -1,4 +1,3 @@
-
 const express = require("express");
 const cors = require("cors");
 const cookieSession = require("cookie-session");
@@ -16,12 +15,17 @@ const upload = multer({
 });
 
 /* ===================================
-   CORS
+   CORS (🚀 UPDATED FOR MULTIPLE PORTS)
 =================================== */
 
-
 app.use(cors({
-  origin: true, 
+  origin: function (origin, callback) {
+    // 1. Mobile app, Postman, ya server-to-server request (no origin) ko allow karo
+    if (!origin) return callback(null, true);
+    
+    // 2. Exact origin wapas bhej do taaki browser ki CORS policy khush rahe
+    callback(null, origin);
+  },
   credentials: true,
   methods: [
     "GET",
@@ -86,18 +90,12 @@ db.mongoose
     useUnifiedTopology: true
   })
   .then(() => {
-
     console.log("MongoDB Connected");
-
     initial();
-
   })
   .catch((err) => {
-
     console.error("MongoDB Connection Error");
-
     console.error(err);
-
   });
 
 /* ===================================
@@ -105,12 +103,10 @@ db.mongoose
 =================================== */
 
 app.get("/test", (req, res) => {
-
   res.status(200).json({
     success: true,
     message: "Server working correctly"
   });
-
 });
 
 /* ===================================
@@ -118,11 +114,9 @@ app.get("/test", (req, res) => {
 =================================== */
 
 app.get("/", (req, res) => {
-
   res.json({
     message: "Backend running"
   });
-
 });
 
 /* ===================================
@@ -139,19 +133,13 @@ app.post(
   "/upload",
   upload.single("file"),
   (req, res) => {
-
     try {
-
       const ename = req.body.ename;
-
       const qname = req.body.qname;
-
       const file = req.file;
 
       console.log("ename:", ename);
-
       console.log("qname:", qname);
-
       console.log("file:", file);
 
       res.status(200).json({
@@ -159,20 +147,14 @@ app.post(
         message: "File uploaded",
         file
       });
-
     } catch (error) {
-
       console.error("Upload Error");
-
       console.error(error);
-
       res.status(500).json({
         success: false,
         error: error.message
       });
-
     }
-
   }
 );
 
@@ -195,16 +177,12 @@ require("./app/routes/payment.routes")(app);
 =================================== */
 
 app.use((err, req, res, next) => {
-
   console.error("GLOBAL ERROR");
-
   console.error(err);
-
   res.status(500).json({
     success: false,
     error: err.message
   });
-
 });
 
 /* ===================================
@@ -218,11 +196,8 @@ module.exports = app;
 =================================== */
 
 function initial() {
-
   Role.estimatedDocumentCount((err, count) => {
-
     if (!err && count === 0) {
-
       new Role({
         name: "user"
       }).save();
@@ -236,9 +211,6 @@ function initial() {
       }).save();
 
       console.log("Default roles added");
-
     }
-
   });
-
 }
