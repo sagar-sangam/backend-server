@@ -47,7 +47,8 @@ exports.paymentSuccess = async (req, res) => {
     const { id } = req.params;
     const { transactionId, amountPaid, expiryDate } = req.body;
 
-    const enrollment = await Enrollment.findByIdAndUpdate(+
+    // 🚀 FIXED: Galti se yahan `+` laga hua tha. Ab hata diya gaya hai!
+    const enrollment = await Enrollment.findByIdAndUpdate(
       id,
       {
         paymentStatus: "paid",
@@ -202,6 +203,7 @@ exports.popularGraph = async (req, res) => {
     });
   }
 };
+
 exports.findOne = async (req, res) => {
   try {
     const data = await Enrollment.findById(req.params.id)
